@@ -1,8 +1,27 @@
 from django.contrib import admin
-from . import models
+from .models import (
+    Product, ProductOption, ProductOptionChoice,
+    Order, Seat, Lab, QRCode
+)
+from .utils.qr import generate_qr
 
-admin.site.register(models.Product)
-admin.site.register(models.ProductOption)
-admin.site.register(models.ProductOptionChoice)
-admin.site.register(models.Order)
-admin.site.register(models.QRCode)
+# Regular model registrations
+admin.site.register(Product)
+admin.site.register(ProductOption)
+admin.site.register(ProductOptionChoice)
+admin.site.register(Order)
+admin.site.register(Seat)
+admin.site.register(Lab)
+
+# QRCode with actions
+@admin.register(QRCode)
+class QRCodeAdmin(admin.ModelAdmin):
+    list_display = ('seat', 'token', 'is_active')
+    actions = ['generate_qr_codes'] 
+    actions_on_top = True
+    actions_on_bottom = True
+
+    def generate_qr_codes(self, request, queryset):
+        for qr in queryset:
+            generate_qr(qr.token)
+        self.message_user(request, "QR codes generated successfully")

@@ -23,17 +23,18 @@ class Seat(models.Model):
         return f'{self.lab.code} - {self.seat_number}'
 
 
+import uuid
+from django.db import models
+
 class QRCode(models.Model):
-    seat = models.ForeignKey(Seat, on_delete=models.CASCADE)
-    token = models.UUIDField(
-        default=uuid.uuid4,
-        unique=True,
-        editable=False
-    )
+    seat = models.OneToOneField(Seat, on_delete=models.CASCADE)
+    token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'QR | {self.seat} | {self.token}'
+        return f'QR - {self.seat}'
+
 
 
 class Product(models.Model):
